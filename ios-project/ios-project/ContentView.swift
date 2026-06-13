@@ -19,6 +19,10 @@ struct ContentView: View {
     @State private var combo = 1
     @State private var lastTapTime = Date()
     
+    @State private var xOffset: CGFloat = 0
+    @State private var yOffset: CGFloat = 0
+    
+    
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     func restartGame() {
@@ -27,6 +31,8 @@ struct ContentView: View {
         gamestarted=false
         combo = 1
         lastTapTime = Date()
+        xOffset = 0
+        yOffset = 0
     }
     
     var body: some View {
@@ -68,6 +74,7 @@ struct ContentView: View {
             .foregroundStyle(.white)
             .background(.green)
             .clipShape(Circle())
+            .offset(x: xOffset, y: yOffset)
 
             Spacer()
             
@@ -81,6 +88,13 @@ struct ContentView: View {
         .onReceive(timer) { _ in
             if gamestarted && time > 0 {
                 time -= 1
+            }
+            
+            if gamestarted && time > 0 && time % 2 == 0 {
+                withAnimation {
+                    xOffset = CGFloat.random(in: -120...120)
+                    yOffset = CGFloat.random(in: -120...120)
+                }
             }
             
             if time == 0 && gamestarted {
