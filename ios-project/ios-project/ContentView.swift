@@ -22,6 +22,8 @@ struct ContentView: View {
     @State private var xOffset: CGFloat = 0
     @State private var yOffset: CGFloat = 0
     
+    @State private var buttonColor: Color = .blue
+    
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
@@ -33,6 +35,7 @@ struct ContentView: View {
         lastTapTime = Date()
         xOffset = 0
         yOffset = 0
+        buttonColor = .blue
     }
     
     var body: some View {
@@ -64,7 +67,16 @@ struct ContentView: View {
                 }
                 
                 if time > 0 {
-                    score += combo
+                    
+                    if buttonColor == .green {
+                        score += combo + 2
+                    }
+                    else if buttonColor == .gray {
+                        score -= 2
+                    }
+                    else {
+                        score += combo
+                    }
                 }
                 
             }
@@ -72,7 +84,7 @@ struct ContentView: View {
             .fontWeight(.bold)
             .frame(width:200, height:200)
             .foregroundStyle(.white)
-            .background(.green)
+            .background(buttonColor)
             .clipShape(Circle())
             .offset(x: xOffset, y: yOffset)
 
@@ -105,9 +117,24 @@ struct ContentView: View {
                 if score > highscore {
                     highscore = score
                 }
-                
+
+            }
+            
+            if gamestarted && time > 0 && time % 2 == 0 {
+                let random = Int.random(in: 0...2)
+                withAnimation {
+                    if random == 0 {
+                        buttonColor = .blue
+                    } else if random == 1 {
+                        buttonColor = .green
+                    } else {
+                        buttonColor = .gray
+                    }
+                }
                 
             }
+            
+            
         }
     
     
