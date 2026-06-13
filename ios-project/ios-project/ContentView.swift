@@ -6,12 +6,28 @@
 //
 
 import SwiftUI
+import Combine
 
 struct ContentView: View {
+    
+    @State private var score = 0
+    @State private var time = 10
+    @State private var gamestarted = false
+    @State private var highscore = 0
+    @State private var showGameOver = false
+    
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    
+    func restartGame() {
+        time = 10
+        score = 0
+        gamestarted=false
+    }
+    
     var body: some View {
         VStack {
             
-            Text("Score:0")
+            Text("Score: \(score)")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .padding(.top, 50)
@@ -20,21 +36,63 @@ struct ContentView: View {
             
             Button("Tap") {
                 
+                if !gamestarted {
+                    gamestarted = true
+                }
+                
+                if time > 0 {
+                    score += 1
+                }
+                
             }
             .font(Font.largeTitle)
             .fontWeight(.bold)
             .frame(width:200, height:200)
             .foregroundStyle(.white)
-            .background(.blue)
+            .background(.green)
             .clipShape(Circle())
 
             Spacer()
             
-            Text("Time:10")
+            Text("Time: \(time)")
                 .font(.title)
                 .fontWeight(.semibold)
                 .padding(.top, 20)
+            
+            
+                .onReceive(timer) { _ in
+                    if gamestarted && time > 0 {
+                        time -= 1
+                    }
+                    
+                    if time == 0 && gamestarted {
+                        
+                        gamestarted = false
+                        showGameOver = true
+                        
+                        if score > highscore {
+                            highscore = score
+                        }
+                        
+                        
+                    }
+                }
+            
+            
+                .alert("Game Over", isPresented: $showGameOver) {
+                    
+                    Button("Restart") {
+                        restartGame()
+                    }
+                    
+                } message: {
+                    Text("Your score: \(score) \nHighscore: \(highscore)")
+                }
+            
+            
         }
+        
+        
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
     }
