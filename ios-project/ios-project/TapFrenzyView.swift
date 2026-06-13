@@ -8,7 +8,7 @@
 import SwiftUI
 import Combine
 
-struct ContentView: View {
+struct TapFrenzyView: View {
     
     @State private var score = 0
     @State private var time = 10
@@ -49,7 +49,7 @@ struct ContentView: View {
         
             Spacer()
             
-            Button("Tap") {
+            Button("TAP") {
                 
                 let now = Date()
                 let diff = now.timeIntervalSince(lastTapTime)
@@ -155,5 +155,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    TapFrenzyView()
 }
