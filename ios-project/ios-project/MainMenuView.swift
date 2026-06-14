@@ -27,8 +27,8 @@ struct MainMenuView: View {
                 .cornerRadius(10)
                 
                 
-                NavigationLink("Mlue") {
-                    GameView()
+                NavigationLink("Light It Up") {
+                    LightItUpView()
                 }
                 .font(.title2)
                 .padding()
