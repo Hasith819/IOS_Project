@@ -8,24 +8,43 @@
 import SwiftUI
 import Combine
 
+
+struct Card: Identifiable {
+    var id: Int
+    var isLit: Bool
+}
+
 struct LightItUpView: View {
     
     @State private var score = 0
     @State private var timeRemaining = 60
+    @State private var gameStarted = false
     
-    @State private var litCardIndex = 0
-
     @State private var showGameOver = false
-    @State private var highScore = 0
     
-    let timer = Timer.publish(every: 1.5, on: .main, in: .common).autoconnect()
+    @State private var currentLevel = 1
+    @State private var cardInterval = 1.5
+    @State private var lastTick = Date()
+    
+    @AppStorage("HighScore")
+    var highScore = 0
+    
+    
+    
+    @State private var cards: [Card] = [
+        Card(id: 0, isLit: false),
+        Card(id: 1, isLit: false),
+        Card(id: 2, isLit: false),
+    ]
+
     let gameTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
-    
-    func restartGame(){
-        score = 0
-        timeRemaining = 60
-        showGameOver = false
+    var columns: [GridItem] {
+        
+        Array(
+            repeating: GridItem(.flexible()),
+            count: currentLevel == 1 ? 3 : 4
+            )
     }
     
     
@@ -41,63 +60,121 @@ struct LightItUpView: View {
             Text("Score: \(score)")
                 .font(.title)
             
+            Text("High Score: \(highScore)")
+                .font(.title3)
+                .fontWeight(.semibold)
+                .foregroundColor(.orange)
+            
+            
             Text("Time Remaining: \(timeRemaining)")
                 .font(.title2)
             
-            HStack {
+            
+            LazyVGrid(columns: columns, spacing: 20) {
                 
-                ForEach(0..<3) { index in
+                ForEach(cards) { card in
                     
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(index == litCardIndex ? Color.yellow : Color.gray)
+                        .fill(card.isLit ? Color.yellow : Color.gray)
+                        .scaleEffect(card.isLit ? 1.1 : 1)
+                        .animation(.easeInOut, value: card.isLit)
                         .frame(width: 90, height: 90)
+                    
                         .onTapGesture {
                             
-                            if index == litCardIndex {
-                                score += 1
+                            gameStarted = true
+                            
+                            if timeRemaining > 0{
+                                
+                                
+                                if card.isLit {
+                                    score += 1
+                                } else {
+                                    score -= 1
+                                }
                             }
                         }
-
-                    
-                    
                 }
-                
             }
             
-            Text("Level 1")
+            Text("Level \(currentLevel)")
                 .font(.title2)
                 .fontWeight(.semibold)
             
-            .onReceive(timer) { _ in
-                litCardIndex = Int.random(in: 0..<3)
-            }
-            
-            .onReceive(gameTimer) { _ in
-                if timeRemaining > 0 {
-                    timeRemaining -= 1
-                }
-                
-                if timeRemaining == 0 {
-                    showGameOver = true
-                    
-                    if score > highScore {
-                        highScore = score
-                    }
-                }
-            }
-            
-            .alert("Game Over", isPresented: $showGameOver){
-                
-                Button("Restart") {
-                    restartGame()
-                }
-            } message: {
-                Text("Score: \(score) \nHigh Score: \(highScore)")
-            }
-            
-           
         }
+        
         .padding()
+        
+        .onReceive(Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()) { _ in
+            
+            guard gameStarted && timeRemaining > 0 else { return }
+            
+            if Date().timeIntervalSince(lastTick) >= cardInterval {
+                lastTick = Date()
+                
+                for i in cards.indices {
+                    cards[i].isLit = false
+                }
+                
+                let index = Int.random(in: 0..<cards.count)
+                cards[index].isLit = true
+                
+            }
+        }
+        
+        
+        
+        
+        .onReceive(gameTimer) { _ in
+            
+            guard gameStarted && timeRemaining > 0 else { return }
+           
+        
+                timeRemaining -= 1
+            
+            if timeRemaining == 45 {
+                
+                currentLevel = 2
+                cardInterval = 1.2
+                
+                cards = [
+                    Card(id: 0, isLit: false),
+                    Card(id: 1, isLit: false),
+                    Card(id: 2, isLit: false),
+                    Card(id: 3, isLit: false),
+                    
+                ]
+            }
+
+            
+            if timeRemaining == 0 {
+                showGameOver = true
+                
+                if score > highScore {
+                    highScore = score
+                }
+            }
+        }
+        
+        .alert("Game Over", isPresented: $showGameOver){
+            
+            Button("Restart") {
+                restartGame()
+            }
+        } message: {
+            Text("Score: \(score) \nHigh Score: \(highScore)")
+        }
+        
+    }
+    
+    func restartGame() {
+        score = 0
+        timeRemaining = 60
+        showGameOver = false
+        
+        for i in cards.indices {
+            cards[i].isLit = false
+        }
     }
 }
 
