@@ -13,7 +13,10 @@ struct TapFrenzyView: View {
     @State private var score = 0
     @State private var time = 10
     @State private var gamestarted = false
-    @State private var highscore = 0
+    
+    @AppStorage("TapFrenzyHighScore")
+    var highscore = 0
+    
     @State private var showGameOver = false
     
     @State private var combo = 1
@@ -23,6 +26,8 @@ struct TapFrenzyView: View {
     @State private var yOffset: CGFloat = 0
     
     @State private var buttonColor: Color = .blue
+    
+    @State private var goToMenu = false
     
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -45,6 +50,7 @@ struct TapFrenzyView: View {
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .padding(.top, 50)
+            
             
         
             Spacer()
@@ -144,9 +150,17 @@ struct TapFrenzyView: View {
                 restartGame()
             }
             
+            Button("Exit") {
+                goToMenu = true
+            }
+            
         } message: {
             Text("Your score: \(score) \nHighscore: \(highscore)")
         }
+        
+        .navigationDestination(isPresented: $goToMenu) {
+                      MainMenuView()
+                  }
         
         
         .frame(maxWidth: .infinity, maxHeight: .infinity)

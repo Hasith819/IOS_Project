@@ -8,6 +8,18 @@
 import SwiftUI
 
 struct MainMenuView: View {
+    
+    
+    @AppStorage("TapFrenzyHighScore")
+    var highScore1 = 0
+    
+    @AppStorage("LightItUpHighScore")
+    var highScore2 = 0
+    
+    
+    
+    
+    
     var body: some View {
         NavigationStack {
             VStack (spacing: 30) {
@@ -33,12 +45,23 @@ struct MainMenuView: View {
                 .font(.title2)
                 .padding()
                 .frame(width: 250)
-                .background(Color.blue)
+                .background(Color.cyan)
                 .foregroundColor(Color.white)
                 .cornerRadius(10)
-                
             
             }
+            
+            Spacer().frame(height: 70)
+            
+            
+            Text("Tap Frenzy High Score: \(highScore1)")
+                .font(.subheadline)
+                .foregroundColor(.gray)
+            
+            Text("Light It Up High Score: \(highScore2)")
+                .font(.subheadline)
+                .foregroundColor(.gray)
+
         }
     }
 }
