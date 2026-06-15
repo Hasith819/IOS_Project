@@ -26,6 +26,7 @@ struct LightItUpView: View {
     @State private var cardInterval = 1.5
     @State private var lastTick = Date()
     
+    
     @AppStorage("HighScore")
     var highScore = 0
     
@@ -41,10 +42,15 @@ struct LightItUpView: View {
     
     var columns: [GridItem] {
         
-        Array(
-            repeating: GridItem(.flexible()),
-            count: currentLevel == 1 ? 3 : 4
-            )
+        if currentLevel == 1 {
+            return Array(repeating: GridItem(.flexible()), count: 3 )
+        }
+        else if currentLevel == 2 {
+            return Array(repeating: GridItem(.flexible()), count: 4 )
+        }
+        else {
+            return Array(repeating: GridItem(.flexible()), count: 3)
+        }
     }
     
     
@@ -145,6 +151,21 @@ struct LightItUpView: View {
                     
                 ]
             }
+            
+            if timeRemaining == 30 {
+                currentLevel = 3
+                cardInterval = 1
+                
+                cards = [
+                    Card(id: 0, isLit: false),
+                    Card(id: 1, isLit: false),
+                    Card(id: 2, isLit: false),
+                    Card(id: 3, isLit: false),
+                    Card(id: 4, isLit: false),
+                    Card(id: 5, isLit: false)
+                    
+                ]
+            }
 
             
             if timeRemaining == 0 {
@@ -161,6 +182,8 @@ struct LightItUpView: View {
             Button("Restart") {
                 restartGame()
             }
+            
+            
         } message: {
             Text("Score: \(score) \nHigh Score: \(highScore)")
         }
@@ -172,9 +195,17 @@ struct LightItUpView: View {
         timeRemaining = 60
         showGameOver = false
         
-        for i in cards.indices {
-            cards[i].isLit = false
-        }
+        gameStarted = false
+        
+        currentLevel = 1
+        cardInterval = 1.5
+        lastTick = Date()
+        
+        cards = [
+                Card(id: 0, isLit: false),
+                Card(id: 1, isLit: false),
+                Card(id: 2, isLit: false)
+            ]
     }
 }
 
