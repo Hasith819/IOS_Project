@@ -48,6 +48,17 @@ struct MainMenuView: View {
                 .background(Color.cyan)
                 .foregroundColor(Color.white)
                 .cornerRadius(10)
+                
+                
+                NavigationLink("Quiz Rush") {
+                    QuizRushView()
+                }
+                .font(.title2)
+                .padding()
+                .frame(width: 250)
+                .background(Color.indigo)
+                .foregroundColor(Color.white)
+                .cornerRadius(10)
             
             }
             
