@@ -31,7 +31,12 @@ class QuizRushViewModel: ObservableObject {
     @Published var isCorrect = false
 
     @Published var shuffledAnswers: [String] = []
+    
+    @AppStorage("QuizRushHighScore")
+     private var highScore: Int = 0
 
+     @Published var bestScore: Int = 0
+    
     private let service = ApiService()
 
     // MARK: - Load Quiz
@@ -47,7 +52,7 @@ class QuizRushViewModel: ObservableObject {
             streak = 0
             selectedAnswer = nil
             isCorrect = false
-
+            bestScore = highScore
             prepareAnswers()
 
             state = .loaded
@@ -89,12 +94,21 @@ class QuizRushViewModel: ObservableObject {
 
             self.selectedAnswer = nil
 
-            if self.currentIndex == self.questions.count - 1 {
-                self.state = .finished
-            } else {
-                self.currentIndex += 1
-                self.prepareAnswers()
-            }
+                if self.currentIndex == self.questions.count - 1 {
+
+                    self.state = .finished
+
+                    // SAVE HIGH SCORE
+                    if self.score > self.highScore {
+                        self.highScore = self.score
+                    }
+
+                    self.bestScore = self.highScore
+
+                } else {
+                    self.currentIndex += 1
+                    self.prepareAnswers()
+                }
         }
     }
 }
@@ -109,9 +123,15 @@ struct QuizRushView: View {
         guard let selected = vm.selectedAnswer else {
             return .blue
         }
+        
+        let correct = vm.currentQuestion.correct_answer
 
-        if selected == answer {
-            return vm.isCorrect ? .green : .red
+        if answer == correct {
+            return .green
+        }
+        
+        if answer == selected {
+            return .red
         }
 
         return .blue
@@ -206,7 +226,7 @@ struct QuizRushView: View {
 
                 VStack(spacing: 25) {
 
-                    Text("🎉 Game Over")
+                    Text("Game Over!")
                         .font(.largeTitle)
 
                     Text("Final Score")
@@ -217,6 +237,16 @@ struct QuizRushView: View {
                         .bold()
 
                     Text("Best Streak: \(vm.streak)")
+                    
+                    Text("High Score: \(vm.bestScore)")
+                        .font(.title3)
+                        .foregroundColor(.yellow)
+
+                    if vm.score == vm.bestScore && vm.score > 0 {
+                        Text("New High Score!")
+                            .font(.headline)
+                            .foregroundColor(.orange)
+                    }
 
                     Button("Play Again") {
                         Task {

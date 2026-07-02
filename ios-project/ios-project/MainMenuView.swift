@@ -16,6 +16,9 @@ struct MainMenuView: View {
     @AppStorage("LightItUpHighScore")
     var highScore2 = 0
     
+    @AppStorage("QuizRushHighScore")
+    var highScore3 = 0
+    
     
     
     
@@ -70,6 +73,10 @@ struct MainMenuView: View {
                 .foregroundColor(.gray)
             
             Text("Light It Up High Score: \(highScore2)")
+                .font(.subheadline)
+                .foregroundColor(.gray)
+            
+            Text("Quiz Rush High Score: \(highScore3)")
                 .font(.subheadline)
                 .foregroundColor(.gray)
 
