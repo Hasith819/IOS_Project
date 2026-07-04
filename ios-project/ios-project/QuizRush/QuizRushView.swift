@@ -192,10 +192,12 @@ struct QuizRushView: View {
 
                     Spacer().frame(height: 35)
 
-                    Text(vm.currentQuestion.question)
+                    Text(vm.currentQuestion.question.htmlDecoded)
                         .font(.title2)
                         .multilineTextAlignment(.center)
                         .padding()
+                    
+                    Spacer().frame(height: 40)
 
                     ForEach(vm.shuffledAnswers, id: \.self) { answer in
 
@@ -205,7 +207,7 @@ struct QuizRushView: View {
 
                         } label: {
 
-                            Text(answer)
+                            Text(answer.htmlDecoded)
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
                                 .padding()
