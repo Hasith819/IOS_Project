@@ -140,6 +140,8 @@ struct QuizRushView: View {
     var body: some View {
 
         ZStack {
+            
+            AnimatedBackground()
 
             switch vm.state {
 
@@ -186,7 +188,7 @@ struct QuizRushView: View {
                         Text("Streak: \(vm.streak)")
                             .font(.title3)
                             .fontWeight(.bold)
-                            .foregroundColor(.orange)
+                            .foregroundColor(Color(red: 1.0, green: 0.84, blue: 0.0))
                     }
                     .padding(.horizontal)
 
@@ -221,6 +223,8 @@ struct QuizRushView: View {
 
                     Text("Question \(vm.currentIndex + 1) of 10")
                         .font(.headline)
+                        .fontWeight(.bold)
+                    
                 }
                 .padding()
 
@@ -228,7 +232,7 @@ struct QuizRushView: View {
 
                 VStack(spacing: 25) {
 
-                    Text("Game Over!")
+                    Text("Well Done!")
                         .font(.largeTitle)
 
                     Text("Final Score")
