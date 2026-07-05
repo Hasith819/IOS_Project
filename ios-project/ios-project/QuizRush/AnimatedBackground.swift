@@ -30,7 +30,7 @@ struct AnimatedBackground: View {
                 .offset(x: animate ? -120 : 120, y: -200)
             
             Circle()
-                .fill(Color.blue.opacity(0.35))
+                .fill(Color.blue.opacity(0.34))
                 .frame(width: 350, height: 350)
                 .blur(radius: 70)
                 .offset(x: animate ? 150 : -150, y: 250)
