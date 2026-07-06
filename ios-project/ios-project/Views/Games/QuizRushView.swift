@@ -37,7 +37,7 @@ class QuizRushViewModel: ObservableObject {
 
      @Published var bestScore: Int = 0
     
-    private let service = ApiService()
+    private let service = TriviaApiService()
 
     // MARK: - Load Quiz
     func loadQuiz() async {
