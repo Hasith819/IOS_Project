@@ -159,7 +159,7 @@ struct TapFrenzyView: View {
         }
         
         .navigationDestination(isPresented: $goToMenu) {
-                      MainMenuView()
+                      HomeTabView()
                   }
         
         

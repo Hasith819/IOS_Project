@@ -11,7 +11,7 @@ import SwiftUI
 struct ios_projectApp: App {
     var body: some Scene {
         WindowGroup {
-            MainMenuView()
+            AppTabShellView()
         }
     }
 }

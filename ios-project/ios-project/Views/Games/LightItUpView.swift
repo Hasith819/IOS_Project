@@ -234,7 +234,7 @@ struct LightItUpView: View {
         
         
         .navigationDestination(isPresented: $goToMenu) {
-                      MainMenuView()
+                      HomeTabView()
                   }
         
         
