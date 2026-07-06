@@ -8,15 +8,21 @@ import SwiftUI
 
 struct SettingsTabView: View {
     
-    @State private var notificationsEnabled = false
-    @State private var challengeTime = Date()
+    @AppStorage("dailyChallengeEnabled") private var notificationsEnabled = false
+    @AppStorage("dailyChallengeTime") private var challengeTimeInterval: Double = Date().timeIntervalSince1970
     
     @State private var showResetConfirmation = false
     @State private var showResetSuccess = false
+    @State private var showPermissionDeniedAlert = false
     
     private let gameSessionStore = GameSessionStore.shared
     
-    
+    private var challengeTimeBinding: Binding<Date> {
+        Binding(
+            get: { Date(timeIntervalSince1970: challengeTimeInterval) },
+            set: { challengeTimeInterval = $0.timeIntervalSince1970 }
+        )
+    }
     
     var body: some View {
         NavigationStack {
@@ -35,7 +41,7 @@ struct SettingsTabView: View {
                     if notificationsEnabled {
                         DatePicker(
                             "Reminder Time",
-                            selection: $challengeTime,
+                            selection: challengeTimeBinding,
                             displayedComponents: .hourAndMinute
                         )
                         .datePickerStyle(.compact)
@@ -96,6 +102,39 @@ struct SettingsTabView: View {
                 Button("OK", role: .cancel) { }
             } message: {
                 Text("All your stats have been cleared.")
+            }
+            .alert("Notifications Disabled", isPresented: $showPermissionDeniedAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Enable notifications for this app in iOS Settings to get your daily challenge reminder.")
+            }
+            .onChange(of: notificationsEnabled) { _, isEnabled in
+                if isEnabled {
+                    requestPermissionAndSchedule()
+                } else {
+                    NotificationService.shared.cancelDailyChallenge()
+                }
+            }
+            .onChange(of: challengeTimeInterval) { _, _ in
+                if notificationsEnabled {
+                    NotificationService.shared.scheduleDailyChallenge(at: challengeTimeBinding.wrappedValue)
+                }
+            }
+            .onAppear {
+                if notificationsEnabled {
+                    NotificationService.shared.scheduleDailyChallenge(at: challengeTimeBinding.wrappedValue)
+                }
+            }
+        }
+    }
+    
+    private func requestPermissionAndSchedule() {
+        NotificationService.shared.requestAuthorization { granted in
+            if granted {
+                NotificationService.shared.scheduleDailyChallenge(at: challengeTimeBinding.wrappedValue)
+            } else {
+                notificationsEnabled = false
+                showPermissionDeniedAlert = true
             }
         }
     }
