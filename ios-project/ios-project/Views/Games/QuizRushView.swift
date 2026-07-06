@@ -160,6 +160,8 @@ struct QuizRushView: View {
         .task {
             await vm.loadQuiz()
         }
+        
+        .toolbar(.hidden, for: .tabBar)
     }
 }
 
