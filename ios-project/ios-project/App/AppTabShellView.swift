@@ -40,3 +40,7 @@ struct AppTabShellView: View {
         }
     }
 }
+
+#Preview {
+    AppTabShellView()
+}

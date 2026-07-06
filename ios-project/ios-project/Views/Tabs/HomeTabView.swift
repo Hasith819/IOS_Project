@@ -57,7 +57,7 @@ struct HomeTabView: View {
             }
             .padding()
         }
-        .navigationTitle("Home")
+//        .navigationTitle("Home")
     }
 
     private func homeCard(title: String, subtitle: String, color: Color) -> some View {
