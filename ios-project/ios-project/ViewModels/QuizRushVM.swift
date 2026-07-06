@@ -18,6 +18,8 @@ enum QuizState {
 
 @MainActor
 class QuizRushVM: ObservableObject {
+    
+    private let sessionStore = GameSessionStore.shared
 
     @Published var questions: [Question] = []
     @Published var currentIndex = 0
@@ -97,6 +99,7 @@ class QuizRushVM: ObservableObject {
                 if self.currentIndex == self.questions.count - 1 {
 
                     self.state = .finished
+                    self.sessionStore.appendSession(mode: .quizRush, score: self.score)
 
                     // SAVE HIGH SCORE
                     if self.score > self.highScore {

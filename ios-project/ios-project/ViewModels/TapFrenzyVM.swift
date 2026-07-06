@@ -10,6 +10,8 @@ import Combine
 
 class TapFrenzyVM: ObservableObject {
     
+    private let sessionStore = GameSessionStore.shared
+    
     @Published var score = 0
     @Published var time = 10
     @Published var gamestarted = false
@@ -94,6 +96,7 @@ class TapFrenzyVM: ObservableObject {
             
             gamestarted = false
             showGameOver = true
+            sessionStore.appendSession(mode: .tapFrenzy, score: score)
             
             if score > highscore {
                 highscore = score

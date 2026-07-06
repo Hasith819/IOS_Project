@@ -18,6 +18,8 @@ struct Card: Identifiable {
 
 class LightItUpVM: ObservableObject {
     
+    private let sessionStore = GameSessionStore.shared
+    
     @Published var score = 0
     @Published var timeRemaining = 60
     @Published var gameStarted = false
@@ -103,6 +105,7 @@ class LightItUpVM: ObservableObject {
         
         if timeRemaining == 0 {
             showGameOver = true
+            sessionStore.appendSession(mode: .lightItUp, score: score)
             
             if score > highScore {
                 highScore = score
