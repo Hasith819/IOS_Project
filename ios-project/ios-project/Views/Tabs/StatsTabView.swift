@@ -4,8 +4,6 @@
 //
 //  Created by student6 on 2026-07-06.
 //
-
-
 import SwiftUI
 import Charts
 
@@ -91,14 +89,14 @@ struct StatsTabView: View {
                             .padding()
                             .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
                     } else {
-                        Chart(sortedSessions.reversed()) { session in
+                        Chart(Array(sortedSessions.reversed().enumerated()), id: \.element.id) { index, session in
                             BarMark(
-                                x: .value("Mode", session.mode.displayName),
+                                x: .value("Session", index),
                                 y: .value("Score", session.score)
                             )
                             .foregroundStyle(by: .value("Mode", session.mode.displayName))
-                            .position(by: .value("Session", session.id.uuidString))
                         }
+                        .chartXAxis(.hidden)
                         .frame(height: 240)
                         .chartLegend(position: .bottom, alignment: .leading)
                         .padding()

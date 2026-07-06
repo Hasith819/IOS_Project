@@ -47,4 +47,8 @@ final class GameSessionStore {
 
         UserDefaults.standard.set(data, forKey: sessionsKey)
     }
+    
+    func resetAllStats() {
+        UserDefaults.standard.removeObject(forKey: sessionsKey)
+    }
 }
