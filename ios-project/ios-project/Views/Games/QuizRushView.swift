@@ -123,37 +123,10 @@ struct QuizRushView: View {
                 .padding()
 
             case .finished:
-
-                VStack(spacing: 25) {
-
-                    Text("Well Done!")
-                        .font(.largeTitle)
-
-                    Text("Final Score")
-                        .font(.title2)
-
-                    Text("\(vm.score)")
-                        .font(.system(size: 55))
-                        .bold()
-
-                    Text("Best Streak: \(vm.streak)")
-                    
-                    Text("High Score: \(vm.bestScore)")
-                        .font(.title3)
-                        .foregroundColor(.yellow)
-
-                    if vm.score == vm.bestScore && vm.score > 0 {
-                        Text("New High Score!")
-                            .font(.headline)
-                            .foregroundColor(.orange)
+                GameOverView(title: "Well Done!", gameName: "Quiz Rush", score: vm.score, highScore: vm.bestScore) {
+                    Task {
+                        await vm.loadQuiz()
                     }
-
-                    Button("Play Again") {
-                        Task {
-                            await vm.loadQuiz()
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
                 }
             }
         }

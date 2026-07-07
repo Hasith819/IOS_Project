@@ -11,7 +11,7 @@ struct LightItUpView: View {
     @StateObject private var vm = LightItUpVM()
     
     var body: some View {
-        
+        ZStack {
         VStack{
             
             VStack(spacing: 20) {
@@ -88,43 +88,22 @@ struct LightItUpView: View {
              }
          }
          .padding()
-            
-        
-        
-        .onReceive(vm.gameTimer) { _ in
-            vm.handleGameTick()
-        }
-        
-        
-        
-        .onReceive(vm.tickTimer) { _ in
-            vm.handleTickTimer()
-        }
-        
-        .alert("Game Over", isPresented: $vm.showGameOver){
-            
-            Button("Restart") {
-                vm.restartGame()
-            }
-            
-            Button("Exit") {
-                vm.goToMenu = true
-            }
-            
-            
-        } message: {
-            Text("Score: \(vm.score) \nHigh Score: \(vm.highScore)")
-        }
-        
-        
-        .navigationDestination(isPresented: $vm.goToMenu) {
-                      HomeTabView()
-                  }
-        
-        
-        .onAppear{
-            vm.setLevel(.L1)
-        }
+         .onReceive(vm.gameTimer) { _ in
+             vm.handleGameTick()
+         }
+         .onReceive(vm.tickTimer) { _ in
+             vm.handleTickTimer()
+         }
+         .onAppear{
+             vm.setLevel(.L1)
+         }
+         
+         if vm.showGameOver {
+             GameOverView(gameName: "Light It Up", score: vm.score, highScore: vm.highScore) {
+                 vm.restartGame()
+             }
+         }
+         }
         
         .toolbar(.hidden, for: .tabBar)
     }

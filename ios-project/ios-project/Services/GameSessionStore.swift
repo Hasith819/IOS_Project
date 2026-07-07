@@ -53,5 +53,9 @@ final class GameSessionStore {
     
     func resetAllStats() {
         UserDefaults.standard.removeObject(forKey: sessionsKey)
+        UserDefaults.standard.removeObject(forKey: "TapFrenzyHighScore")
+        UserDefaults.standard.removeObject(forKey: "LightItUpHighScore")
+        UserDefaults.standard.removeObject(forKey: "QuizRushHighScore")
+        
     }
 }

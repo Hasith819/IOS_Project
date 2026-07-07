@@ -12,12 +12,22 @@ struct HomeTabView: View {
     @AppStorage("LightItUpHighScore") private var lightItUpHighScore = 0
     @AppStorage("QuizRushHighScore") private var quizRushHighScore = 0
     
+    @AppStorage("dailyChallengeDate") private var dailyChallengeDateStr = ""
+    @AppStorage("dailyChallengeModeRaw") private var dailyChallengeModeRaw = GameMode.tapFrenzy.rawValue
+    @State private var dailyChallengeCompleted = false
+    
+    private var challengeMode: GameMode {
+        GameMode(rawValue: dailyChallengeModeRaw) ?? .tapFrenzy
+    }
+    
     
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
                 
                 headerView
+                
+                dailyChallengeView
                 
                 NavigationLink {
                     TapFrenzyView()
@@ -79,6 +89,81 @@ struct HomeTabView: View {
             }
             .padding()
         }
+        .onAppear {
+            checkDailyChallenge()
+        }
+    }
+    
+    private func checkDailyChallenge() {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let today = formatter.string(from: Date())
+        
+        if dailyChallengeDateStr != today {
+            dailyChallengeDateStr = today
+            dailyChallengeModeRaw = GameMode.allCases.randomElement()!.rawValue
+            dailyChallengeCompleted = false
+        }
+        
+        let sessions = GameSessionStore.shared.loadSessions()
+        let hasPlayedToday = sessions.contains { session in
+            session.mode == challengeMode && formatter.string(from: session.timestamp) == today
+        }
+        
+        dailyChallengeCompleted = hasPlayedToday
+    }
+    
+    @ViewBuilder
+    private var dailyChallengeView: some View {
+        if dailyChallengeCompleted {
+            HStack(spacing: 12) {
+                Image(systemName: "checkmark.seal.fill")
+                    .foregroundColor(.green)
+                    .font(.largeTitle)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Daily Challenge Completed!")
+                        .font(.headline)
+                    Text("Great job playing \(challengeMode.displayName) today.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+            }
+            .padding()
+            .background(Color.green.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
+        } else {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Image(systemName: "star.fill")
+                        .foregroundColor(.orange)
+                    Text("Daily Challenge")
+                        .font(.headline)
+                }
+                
+                Text("Play a game of \(challengeMode.displayName) to complete today's challenge!")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                
+                NavigationLink {
+                    switch challengeMode {
+                    case .tapFrenzy: TapFrenzyView()
+                    case .lightItUp: LightItUpView()
+                    case .quizRush: QuizRushView()
+                    }
+                } label: {
+                    Text("Play Now")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color.orange.gradient)
+                        .cornerRadius(12)
+                }
+            }
+            .padding()
+            .background(Color.orange.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
+        }
     }
     
     
@@ -86,9 +171,7 @@ struct HomeTabView: View {
         VStack(spacing: 8) {
             Text("PlayHub")
                 .font(.largeTitle.bold())
-            
-            Text("Crazy games. One polished shell.")
-                .foregroundStyle(.secondary)
+
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 20)

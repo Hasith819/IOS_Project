@@ -12,7 +12,8 @@ struct TapFrenzyView: View {
     @StateObject private var vm = TapFrenzyVM()
     
     var body: some View {
-        VStack {
+        ZStack {
+            VStack {
             
             Text("Score: \(vm.score)")
                 .font(.largeTitle)
@@ -42,33 +43,18 @@ struct TapFrenzyView: View {
                 .padding(.top, 20)
             
         }
-        
         .onReceive(vm.timer) { _ in
             vm.handleTimerTick()
         }
-    
-    
-        .alert("Game Over", isPresented: $vm.showGameOver) {
-            
-            Button("Restart") {
-                vm.restartGame()
-            }
-            
-            Button("Exit") {
-                vm.goToMenu = true
-            }
-            
-        } message: {
-            Text("Your score: \(vm.score) \nHighscore: \(vm.highscore)")
-        }
-        
-        .navigationDestination(isPresented: $vm.goToMenu) {
-                      HomeTabView()
-                  }
-        
-        
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
+        
+        if vm.showGameOver {
+            GameOverView(gameName: "Tap Frenzy", score: vm.score, highScore: vm.highscore) {
+                vm.restartGame()
+            }
+        }
+        }
         .toolbar(.hidden, for: .tabBar)
     }
 }

@@ -10,6 +10,10 @@ import Charts
 struct StatsTabView: View {
     @State private var sessions: [GameSession] = GameSessionStore.shared.loadSessions()
 
+    @AppStorage("TapFrenzyHighScore") private var tapFrenzyHighScore = 0
+    @AppStorage("LightItUpHighScore") private var lightItUpHighScore = 0
+    @AppStorage("QuizRushHighScore") private var quizRushHighScore = 0
+
     private var sortedSessions: [GameSession] {
         sessions.sorted { $0.timestamp > $1.timestamp }
     }
@@ -18,50 +22,37 @@ struct StatsTabView: View {
         sessions.count
     }
 
-    private var bestSession: GameSession? {
-        sessions.max { left, right in
-            if left.score == right.score {
-                return left.timestamp < right.timestamp
-            }
-
-            return left.score < right.score
-        }
+    private var overallBestScore: Int {
+        max(tapFrenzyHighScore, max(lightItUpHighScore, quizRushHighScore))
     }
 
     private var bestScoresByMode: [(mode: GameMode, score: Int)] {
-        GameMode.allCases.map { mode in
-            let best = sessions
-                .filter { $0.mode == mode }
-                .map(\.score)
-                .max() ?? 0
-
-            return (mode: mode, score: best)
-        }
+        return [
+            (.tapFrenzy, tapFrenzyHighScore),
+            (.lightItUp, lightItUpHighScore),
+            (.quizRush, quizRushHighScore)
+        ]
     }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Game Stats")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
+                 
 
-                    Text("Track totals, best runs, and recent sessions.")
-                        .foregroundStyle(.secondary)
                 }
 
                 HStack(spacing: 12) {
-                    StatCard(title: "Sessions", value: "\(totalSessions)")
+                    StatCard(title: "Total Plays", value: "\(totalSessions)")
 
                     StatCard(
                         title: "Best",
-                        value: bestSession.map { "\($0.score)" } ?? "0"
+                        value: "\(overallBestScore)"
                     )
                 }
 
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Best by Mode")
+                    Text("Best by Games")
                         .font(.headline)
 
                     VStack(spacing: 10) {
@@ -79,11 +70,11 @@ struct StatsTabView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Sessions by Mode")
+                    Text("Game Sessions")
                         .font(.headline)
 
                     if sortedSessions.isEmpty {
-                        Text("No sessions yet. Play a game to populate this chart.")
+                        Text("No games played yet. Play a game to populate this chart.")
                             .foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding()
@@ -143,7 +134,7 @@ struct StatsTabView: View {
 
                 if let latest = sortedSessions.first {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Latest Session")
+                        Text("Latest Played")
                             .font(.headline)
 
                         Text("\(latest.mode.displayName) - Score \(latest.score)")

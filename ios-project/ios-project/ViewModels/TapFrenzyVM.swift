@@ -46,6 +46,7 @@ class TapFrenzyVM: ObservableObject {
         xOffset = 0
         yOffset = 0
         buttonColor = .blue
+        showGameOver = false
     }
     
     func handleTap() {
@@ -61,7 +62,7 @@ class TapFrenzyVM: ObservableObject {
         
         lastTapTime = now
         
-        if !gamestarted {
+        if !gamestarted && time > 0 && !showGameOver {
             gamestarted = true
         }
         
