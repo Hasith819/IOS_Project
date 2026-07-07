@@ -20,6 +20,7 @@ class LightItUpVM: ObservableObject {
     
     private let sessionStore = GameSessionStore.shared
     
+    
     @Published var score = 0
     @Published var timeRemaining = 60
     @Published var gameStarted = false
@@ -88,7 +89,7 @@ class LightItUpVM: ObservableObject {
         if card.isLit {
             score += 1
         } else {
-            score -= 1
+            score = max(score-1,0)
         }
     }
     
