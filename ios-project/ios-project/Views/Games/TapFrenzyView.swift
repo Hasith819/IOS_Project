@@ -69,6 +69,7 @@ struct TapFrenzyView: View {
         
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
+        .toolbar(.hidden, for: .tabBar)
     }
 }
 

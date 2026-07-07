@@ -5,6 +5,7 @@
 //  Created by student6 on 2026-07-06.
 //
 import Foundation
+import CoreLocation
 
 final class GameSessionStore {
     static let shared = GameSessionStore()
@@ -26,14 +27,16 @@ final class GameSessionStore {
         return (try? decoder.decode([GameSession].self, from: data)) ?? []
     }
 
-    func appendSession(mode: GameMode, score: Int) {
+    func appendSession(mode: GameMode, score: Int, location: CLLocation?) {
         var sessions = loadSessions()
 
         let newSession = GameSession(
             id: UUID(),
             mode: mode,
             score: score,
-            timestamp: Date()
+            timestamp: Date(),
+            latitude: location?.coordinate.latitude ?? 0,
+            longitude: location?.coordinate.longitude ?? 0
         )
 
         sessions.append(newSession)

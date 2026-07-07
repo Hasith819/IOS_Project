@@ -41,7 +41,7 @@ class QuizRushVM: ObservableObject {
     
     private let service = TriviaApiService()
 
-    // MARK: - Load Quiz
+   
     func loadQuiz() async {
 
         state = .loading
@@ -64,12 +64,12 @@ class QuizRushVM: ObservableObject {
         }
     }
 
-    // MARK: - Current Question
+
     var currentQuestion: Question {
         questions[currentIndex]
     }
 
-    // MARK: - Shuffle ONCE per question
+ 
     func prepareAnswers() {
         shuffledAnswers =
             ([currentQuestion.correct_answer] +
@@ -77,7 +77,7 @@ class QuizRushVM: ObservableObject {
             .shuffled()
     }
 
-    // MARK: - Answer Logic
+ 
     func answerTapped(_ answer: String) {
 
         selectedAnswer = answer
@@ -99,9 +99,12 @@ class QuizRushVM: ObservableObject {
                 if self.currentIndex == self.questions.count - 1 {
 
                     self.state = .finished
-                    self.sessionStore.appendSession(mode: .quizRush, score: self.score)
-
-                    // SAVE HIGH SCORE
+                    self.sessionStore.appendSession(
+                        mode: .quizRush,
+                        score: self.score,
+                        location: LocationService.shared.currentLocation
+                    )
+                  
                     if self.score > self.highScore {
                         self.highScore = self.score
                     }

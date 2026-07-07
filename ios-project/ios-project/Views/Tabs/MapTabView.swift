@@ -4,26 +4,42 @@
 //
 //  Created by student6 on 2026-07-06.
 //
-
 import SwiftUI
+import MapKit
+
 
 struct MapTabView: View {
+    
+    @State private var sessions: [GameSession] = []
+    
+    
+    @StateObject private var locationService =
+        LocationService.shared
+    
+    
     var body: some View {
-        VStack(spacing: 20) {
-            Text("Hello, World!")
-                .font(.largeTitle)
-                .fontWeight(.bold)
+        
+        NavigationStack {
             
-            Text("Map")
-                .font(.title)
-                .foregroundStyle(.cyan)
-
-            Text("Fixy Automobiles")
-                .font(.title3)
-                .foregroundStyle(.gray)
+            Map {
+                
+                ForEach(sessions) { session in
+                    
+                    Marker(
+                        session.mode.displayName,
+                        coordinate: session.coordinate
+                    )
+                }
+            }
+   
+            .onAppear {
+                
+                sessions =
+                GameSessionStore.shared.loadSessions()
+                
+                locationService.requestPermission()
+            }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.white)
     }
 }
 

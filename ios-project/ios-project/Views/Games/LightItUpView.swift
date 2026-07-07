@@ -126,6 +126,7 @@ struct LightItUpView: View {
             vm.setLevel(.L1)
         }
         
+        .toolbar(.hidden, for: .tabBar)
     }
 }
 

@@ -14,7 +14,7 @@ struct HomeTabView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                // Header
+
                 VStack(spacing: 8) {
                     Text("PlayHub")
                         .font(.largeTitle.bold())

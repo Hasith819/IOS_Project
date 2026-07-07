@@ -96,7 +96,11 @@ class TapFrenzyVM: ObservableObject {
             
             gamestarted = false
             showGameOver = true
-            sessionStore.appendSession(mode: .tapFrenzy, score: score)
+            sessionStore.appendSession(
+                mode: .tapFrenzy,
+                score: score,
+                location: LocationService.shared.currentLocation
+            )
             
             if score > highscore {
                 highscore = score

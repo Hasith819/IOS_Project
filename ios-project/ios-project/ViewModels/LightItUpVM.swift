@@ -105,7 +105,11 @@ class LightItUpVM: ObservableObject {
         
         if timeRemaining == 0 {
             showGameOver = true
-            sessionStore.appendSession(mode: .lightItUp, score: score)
+            sessionStore.appendSession(
+                mode: .lightItUp,
+                score: score,
+                location: LocationService.shared.currentLocation
+            )
             
             if score > highScore {
                 highScore = score

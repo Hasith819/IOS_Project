@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreLocation
 
 enum GameMode: String, Codable, CaseIterable, Identifiable {
     
@@ -33,4 +34,13 @@ struct GameSession: Codable, Identifiable {
     var mode: GameMode
     let score: Int
     let timestamp: Date
+    let latitude: Double
+    let longitude: Double
+
+    var coordinate: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(
+            latitude: latitude,
+            longitude: longitude
+        )
+    }
 }
