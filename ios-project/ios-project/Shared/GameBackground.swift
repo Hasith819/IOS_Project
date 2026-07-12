@@ -8,14 +8,14 @@
 import SwiftUI
 
 
-struct AnimatedBackground: View {
+struct GameBackground: View {
     @State private var animate = false
     
     var body: some View {
         ZStack {
             LinearGradient(
                 colors: [
-                    Color.white,
+                    Color.black,
                     Color(red: 0.05, green: 0.05, blue: 0.05)
         ],
                 startPoint: .topLeading,

@@ -13,12 +13,17 @@ struct TapFrenzyView: View {
     
     var body: some View {
         ZStack {
+            
+            GameBackground()
+                .ignoresSafeArea()
+            
             VStack {
             
             Text("Score: \(vm.score)")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .padding(.top, 50)
+                .foregroundColor(.white)
             
             
         
@@ -41,6 +46,7 @@ struct TapFrenzyView: View {
                 .font(.title)
                 .fontWeight(.semibold)
                 .padding(.top, 20)
+                .foregroundColor(.white)
             
         }
         .onReceive(vm.timer) { _ in

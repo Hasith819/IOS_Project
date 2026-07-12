@@ -18,25 +18,25 @@ struct GameOverView: View {
     
     var body: some View {
         ZStack {
-            Color.black.opacity(0.6)
+            Color.black.opacity(0.3)
                 .ignoresSafeArea()
             
             VStack(spacing: 24) {
                 Text(title)
                     .font(.system(.title, design: .rounded))
                     .bold()
-                    .foregroundColor(.primary)
+                    .foregroundColor(.white)
                 
                 
                 VStack(spacing: 6) {
                     Text("Score")
                         .font(.subheadline)
                         .fontWeight(.semibold)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.white.opacity(0.7))
                     
                     Text("\(score)")
                         .font(.system(size: 54, weight: .heavy, design: .rounded))
-                        .foregroundColor(.primary)
+                        .foregroundColor(.white)
                     
                     HStack(spacing: 6) {
                         Image(systemName: "trophy.fill")
@@ -95,9 +95,12 @@ struct GameOverView: View {
             }
             .padding(24)
             .frame(maxWidth: 300) 
-            .background(.regularMaterial)
+            .background(
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(.black.opacity(0.85))
+            )
             .cornerRadius(24)
-            .shadow(color: Color.black.opacity(0.15), radius: 20, x: 0, y: 10)
+            .shadow(color: Color.black.opacity(0.35), radius: 25, x: 0, y: 10)
             .padding(.horizontal, 24)
         }
     }

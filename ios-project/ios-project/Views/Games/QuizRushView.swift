@@ -11,7 +11,6 @@ struct QuizRushView: View {
 
     @StateObject private var vm = QuizRushVM()
 
-    // MARK: - Button Color
     func buttonColor(for answer: String) -> Color {
 
         guard let selected = vm.selectedAnswer else {
@@ -35,7 +34,7 @@ struct QuizRushView: View {
 
         ZStack {
             
-            AnimatedBackground()
+            GameBackground()
 
             switch vm.state {
 
@@ -45,6 +44,7 @@ struct QuizRushView: View {
                     ProgressView()
                     Text("Loading Questions...")
                         .padding()
+                        .foregroundColor(.white)
                 }
 
             case .failed:
@@ -52,6 +52,7 @@ struct QuizRushView: View {
                 VStack(spacing: 20) {
 
                     Text("Failed to load questions.")
+                        .foregroundColor(.white)
 
                     Button("Retry") {
                         Task {
@@ -68,6 +69,7 @@ struct QuizRushView: View {
                     Text("Quiz Rush")
                         .font(.largeTitle)
                         .bold()
+                        .foregroundColor(.white)
 
                     Spacer().frame(height: 25)
 
@@ -76,7 +78,8 @@ struct QuizRushView: View {
                         Text("Score: \(vm.score)")
                             .font(.title3)
                             .fontWeight(.bold)
-
+                            .foregroundColor(.white)
+                        
                         Spacer()
 
                         Text("Streak: \(vm.streak)")
@@ -91,6 +94,7 @@ struct QuizRushView: View {
                     Text(vm.currentQuestion.question.htmlDecoded)
                         .font(.title2)
                         .multilineTextAlignment(.center)
+                        .foregroundColor(.white)
                         .padding()
                     
                     Spacer().frame(height: 40)
@@ -118,7 +122,7 @@ struct QuizRushView: View {
                     Text("Question \(vm.currentIndex + 1) of 10")
                         .font(.headline)
                         .fontWeight(.bold)
-                    
+                        .foregroundColor(.white)
                 }
                 .padding()
 

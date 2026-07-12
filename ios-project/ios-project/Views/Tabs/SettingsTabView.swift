@@ -8,133 +8,165 @@ import SwiftUI
 
 struct SettingsTabView: View {
     
+    @StateObject private var viewModel = SettingsVM()
+    
     @AppStorage("dailyChallengeEnabled") private var notificationsEnabled = false
-    @AppStorage("dailyChallengeTime") private var challengeTimeInterval: Double = Date().timeIntervalSince1970
     
-    @State private var showResetConfirmation = false
-    @State private var showResetSuccess = false
-    @State private var showPermissionDeniedAlert = false
-    
-    private let gameSessionStore = GameSessionStore.shared
+    @AppStorage("dailyChallengeTime")
+    private var challengeTimeInterval: Double = Date().timeIntervalSince1970
     
     private var challengeTimeBinding: Binding<Date> {
         Binding(
-            get: { Date(timeIntervalSince1970: challengeTimeInterval) },
-            set: { challengeTimeInterval = $0.timeIntervalSince1970 }
+            get: {
+                Date(timeIntervalSince1970: challengeTimeInterval)
+            },
+            set: {
+                challengeTimeInterval = $0.timeIntervalSince1970
+            }
         )
     }
     
     var body: some View {
         NavigationStack {
-            Form {
+            ZStack {
+              
+                MenuBackground()
+                    .ignoresSafeArea()
                 
-                Section {
-                    Toggle(isOn: $notificationsEnabled.animation()) {
-                        Label {
-                            Text("Daily Challenge")
-                        } icon: {
-                            Image(systemName: "bell.badge.fill")
-                                .foregroundStyle(.orange)
+                Form {
+                    Section {
+                        Toggle(isOn: $notificationsEnabled.animation()) {
+                            Label {
+                                Text("Daily Challenge")
+                                    .foregroundColor(.white)
+                            } icon: {
+                                Image(systemName: "bell.badge.fill")
+                                    .foregroundStyle(.orange)
+                            }
                         }
+                        .listRowBackground(Color.white.opacity(0.08))
+                        
+                        if notificationsEnabled {
+                            DatePicker(
+                                "Reminder Time",
+                                selection: challengeTimeBinding,
+                                displayedComponents: .hourAndMinute
+                            )
+                            .datePickerStyle(.compact)
+                            .listRowBackground(Color.white.opacity(0.08))
+                            .colorScheme(.dark)
+                        }
+                        
+                    } header: {
+                        Text("Notifications")
+                            .foregroundColor(.white.opacity(0.6))
+                    } footer: {
+                        Text(
+                            notificationsEnabled
+                            ? "You'll get a reminder every day at the selected time to play your daily challenge."
+                            : "Turn this on to get a daily reminder to come back and play."
+                        )
+                        .foregroundColor(.white.opacity(0.5))
                     }
                     
-                    if notificationsEnabled {
-                        DatePicker(
-                            "Reminder Time",
-                            selection: challengeTimeBinding,
-                            displayedComponents: .hourAndMinute
-                        )
-                        .datePickerStyle(.compact)
-                    }
-                } header: {
-                    Text("Notifications")
-                } footer: {
-                    Text(notificationsEnabled
-                         ? "You'll get a reminder every day at the selected time to play your daily challenge."
-                         : "Turn this on to get a daily reminder to come back and play.")
-                }
-                
-                Section {
-                    Button(role: .destructive) {
-                        showResetConfirmation = true
-                    } label: {
-                        Label {
-                            Text("Reset All Stats")
-                                .foregroundStyle(.red)
-                        } icon: {
-                            Image(systemName: "trash.fill")
-                                .foregroundStyle(.red)
+                    Section {
+                        Button(role: .destructive) {
+                            viewModel.showResetConfirmation = true
+                        } label: {
+                            Label {
+                                Text("Reset All Stats")
+                                    .foregroundStyle(.red)
+                            } icon: {
+                                Image(systemName: "trash.fill")
+                                    .foregroundStyle(.red)
+                            }
                         }
+                        .listRowBackground(Color.white.opacity(0.08))
+                        
+                    } header: {
+                        Text("Data")
+                            .foregroundColor(.white.opacity(0.6))
+                    } footer: {
+                        Text("This permanently deletes your scores, high scores, and session history across all games.")
+                            .foregroundColor(.white.opacity(0.5))
                     }
-                } header: {
-                    Text("Data")
-                } footer: {
-                    Text("This permanently deletes your scores, high scores, and session history across all games.")
+                    
+                    Section {
+                        HStack {
+                            Label("Version", systemImage: "info.circle")
+                                .foregroundColor(.white)
+                            
+                            Spacer()
+                            
+                            Text("1.0.0")
+                                .foregroundStyle(.white.opacity(0.6))
+                        }
+                        .listRowBackground(Color.white.opacity(0.08))
+                        
+                    } header: {
+                        Text("About")
+                            .foregroundColor(.white.opacity(0.6))
+                    }
                 }
                 
-
-                Section {
-                    HStack {
-                        Label("Version", systemImage: "info.circle")
-                        Spacer()
-                        Text("1.0.0")
-                            .foregroundStyle(.secondary)
-                    }
-                } header: {
-                    Text("About")
-                }
+                .scrollContentBackground(.hidden)
             }
             .navigationTitle("Settings")
+            
+            .preferredColorScheme(.dark)
+            
             .confirmationDialog(
                 "Reset all stats?",
-                isPresented: $showResetConfirmation,
+                isPresented: $viewModel.showResetConfirmation,
                 titleVisibility: .visible
             ) {
                 Button("Reset Everything", role: .destructive) {
-                    gameSessionStore.resetAllStats()
-                    showResetSuccess = true
+                    viewModel.resetStats()
                 }
-                Button("Cancel", role: .cancel) { }
+                Button("Cancel", role: .cancel) {}
             } message: {
                 Text("This action cannot be undone. All scores and game history will be permanently deleted.")
             }
-            .alert("Stats Reset", isPresented: $showResetSuccess) {
-                Button("OK", role: .cancel) { }
+            
+            .alert("Stats Reset", isPresented: $viewModel.showResetSuccess) {
+                Button("OK", role: .cancel) {}
             } message: {
                 Text("All your stats have been cleared.")
             }
-            .alert("Notifications Disabled", isPresented: $showPermissionDeniedAlert) {
-                Button("OK", role: .cancel) { }
+            
+            .alert("Notifications Disabled", isPresented: $viewModel.showPermissionDeniedAlert) {
+                Button("OK", role: .cancel) {}
             } message: {
                 Text("Enable notifications for this app in iOS Settings to get your daily challenge reminder.")
             }
+            
             .onChange(of: notificationsEnabled) { _, isEnabled in
                 if isEnabled {
-                    requestPermissionAndSchedule()
+                    viewModel.requestPermissionAndSchedule(
+                        notificationsEnabled: $notificationsEnabled,
+                        challengeTime: challengeTimeBinding.wrappedValue
+                    )
                 } else {
-                    NotificationService.shared.cancelDailyChallenge()
+                    viewModel.cancelNotification()
                 }
             }
+            
             .onChange(of: challengeTimeInterval) { _, _ in
                 if notificationsEnabled {
-                    NotificationService.shared.scheduleDailyChallenge(at: challengeTimeBinding.wrappedValue)
+                    viewModel.scheduleNotification(
+                        enabled: true,
+                        time: challengeTimeBinding.wrappedValue
+                    )
                 }
             }
+            
             .onAppear {
                 if notificationsEnabled {
-                    NotificationService.shared.scheduleDailyChallenge(at: challengeTimeBinding.wrappedValue)
+                    viewModel.scheduleNotification(
+                        enabled: true,
+                        time: challengeTimeBinding.wrappedValue
+                    )
                 }
-            }
-        }
-    }
-    
-    private func requestPermissionAndSchedule() {
-        NotificationService.shared.requestAuthorization { granted in
-            if granted {
-                NotificationService.shared.scheduleDailyChallenge(at: challengeTimeBinding.wrappedValue)
-            } else {
-                notificationsEnabled = false
-                showPermissionDeniedAlert = true
             }
         }
     }
