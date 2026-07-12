@@ -87,7 +87,35 @@ struct QuizRushView: View {
                             .fontWeight(.bold)
                             .foregroundColor(Color(red: 1.0, green: 0.84, blue: 0.0))
                     }
+                    
                     .padding(.horizontal)
+                    
+                    
+                    Spacer()
+                        .frame(height: 22)
+                    
+                    VStack(spacing: 8) {
+
+                        HStack {
+                            Text("Time")
+                                .foregroundColor(.white)
+                                .fontWeight(.bold)
+
+                            Spacer()
+
+                            Text("\(vm.timeRemaining)s")
+                                .foregroundColor(.yellow)
+                                .fontWeight(.bold)
+                        }
+
+                        ProgressView(value: vm.timerProgress)
+                            .progressViewStyle(.linear)
+                            .tint(
+                                vm.timeRemaining <= 3 ? .red : .cyan
+                            )
+                    }
+                    .padding(.horizontal)
+                   
 
                     Spacer().frame(height: 35)
 

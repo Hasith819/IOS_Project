@@ -20,6 +20,11 @@ enum QuizState {
 class QuizRushVM: ObservableObject {
     
     private let sessionStore = GameSessionStore.shared
+    
+    @Published var timeRemaining = 10
+    @Published var timerProgress: Double = 1.0
+
+    private var timerTask: Task<Void, Never>?
 
     @Published var questions: [Question] = []
     @Published var currentIndex = 0
@@ -40,7 +45,67 @@ class QuizRushVM: ObservableObject {
      @Published var bestScore: Int = 0
     
     private let service = TriviaApiService()
-
+    
+    func startQuestionTimer() {
+        
+        timerTask?.cancel()
+        
+        timeRemaining = 10
+        timerProgress = 1.0
+        
+        timerTask = Task {
+            
+            while timeRemaining > 0 {
+                
+                try? await Task.sleep(for: .seconds(1))
+                
+                guard !Task.isCancelled else { return }
+                
+                timeRemaining -= 1
+                timerProgress = Double(timeRemaining) / 10.0
+            }
+            
+            if timeRemaining == 0 {
+                await MainActor.run {
+                    moveToNextQuestion()
+                }
+            }
+        }
+    }
+    
+    func moveToNextQuestion() {
+        
+        selectedAnswer = currentQuestion.correct_answer
+        
+        timerTask?.cancel()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            
+            self.selectedAnswer = nil
+            
+            if self.currentIndex == self.questions.count - 1 {
+                
+                self.state = .finished
+                
+                self.sessionStore.appendSession(
+                    mode: .quizRush,
+                    score: self.score,
+                    location: LocationService.shared.currentLocation
+                )
+                
+                if self.score > self.highScore {
+                    self.highScore = self.score
+                }
+                
+                self.bestScore = self.highScore
+                
+            } else {
+                self.currentIndex += 1
+                self.prepareAnswers()
+                self.startQuestionTimer()
+            }
+        }
+    }
    
     func loadQuiz() async {
 
@@ -56,7 +121,7 @@ class QuizRushVM: ObservableObject {
             isCorrect = false
             bestScore = highScore
             prepareAnswers()
-
+            startQuestionTimer()
             state = .loaded
 
         } catch {
@@ -79,7 +144,11 @@ class QuizRushVM: ObservableObject {
 
  
     func answerTapped(_ answer: String) {
-
+        
+        guard selectedAnswer == nil else { return }
+        
+        timerTask?.cancel()
+        
         selectedAnswer = answer
 
         if answer == currentQuestion.correct_answer {
@@ -93,28 +162,7 @@ class QuizRushVM: ObservableObject {
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-
-            self.selectedAnswer = nil
-
-                if self.currentIndex == self.questions.count - 1 {
-
-                    self.state = .finished
-                    self.sessionStore.appendSession(
-                        mode: .quizRush,
-                        score: self.score,
-                        location: LocationService.shared.currentLocation
-                    )
-                  
-                    if self.score > self.highScore {
-                        self.highScore = self.score
-                    }
-
-                    self.bestScore = self.highScore
-
-                } else {
-                    self.currentIndex += 1
-                    self.prepareAnswers()
-                }
+            self.moveToNextQuestion()
         }
     }
 }
